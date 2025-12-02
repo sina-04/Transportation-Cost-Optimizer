@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import argparse
 import textwrap
 
@@ -30,11 +28,11 @@ parser = argparse.ArgumentParser(
         The file has the following structure, separated by commas.
         Supply column, demand row, transportation costs.
         For example if the problem comes with the following form:
-           
-                  D1  D2  D3  Supply
-              S1   8    6	10   2000
-              S2   10   4    9   2500
-            Demand 1500 2000 1000
+        
+                D1  D2  D3  Supply
+            S1   8    6   10   2000
+            S2   10   4    9   2500
+        Demand 1500 2000 1000
         
         The file must come as the next example:
         2000,2500
@@ -48,9 +46,7 @@ parser.add_argument('method', metavar='method', type=int,
 
 parser.add_argument('file', metavar='file.txt', type=argparse.FileType("r"),
                     help='Text file with the transportation problem in the correct format')
-
 args = parser.parse_args()
-
 
 def main():
     solving_methods = {
@@ -61,7 +57,6 @@ def main():
     desired_method = MethodType(args.method)
     solver = solving_methods.get(desired_method)(file=args.file)
     solver.solve()
-
 
 if __name__ == "__main__":
     main()
