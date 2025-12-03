@@ -1,62 +1,62 @@
+from abc import ABC
+
+from approximation_method import ApproximationMethod
 import numpy as np
-import timeit
 
-Supply = [300, 400, 500]
-Demand = [250, 350, 400, 200]
+class LeastCostCellMethod(ApproximationMethod, ABC):
 
-costs_matrix = np.array([
-    [3, 1, 7, 4],
-    [2, 6, 5, 9],
-    [8, 3, 3, 2]
-])
+    def __init__(self, file):
+        # This will:
+        #   - read supply/demand/costs from file
+        #   - balance the problem (dummy rows/cols if needed)
+        #   - create assign_table and transportation_table
+        super().__init__(file=file)
 
-# Allocation matrix (same shape as cost matrix)
-allocation = np.zeros_like(costs_matrix, dtype=int)
+    def solve(self) -> None:
+        """
+        Builds an initial solution using the Least Cost method:
+        always pick the globally cheapest available cell.
+        """
+        # Keep assigning while there are rows/columns left
+        while self.has_rows_and_columns_left():
+            self.choose_cost()
 
-# While any supply or demand is still left
-while sum(Supply) > 0 and sum(Demand) > 0:
+        # Write initial solution & cost
+        self.writer.write_initial_solution(
+            self.assign_table,
+            demand=self.cost_table[self.demand_row],
+            supply=self.cost_table[:, self.supply_column],
+        )
+        self.writer.write_initial_cost(self.total_cost())
 
-    # Convert to float so infinity masking works
-    masked_costs = costs_matrix.astype(float).copy()
+        # Try to improve with the MODI/transportation algorithm
+        self.improve()
 
-    # Mask exhausted rows and columns
-    for i in range(len(Supply)):
-        if Supply[i] == 0:
-            masked_costs[i, :] = np.inf
+    def choose_cost(self) -> None:
+        """
+        Find the globally cheapest available (non-deleted) cost cell
+        and assign as much as possible to it.
+        """
+        min_cost = np.inf
+        min_i, min_j = -1, -1
 
-    for j in range(len(Demand)):
-        if Demand[j] == 0:
-            masked_costs[:, j] = np.inf
+        # Search over all still-available cells
+        for i in range(self.demand_row):           # skip the demand row
+            if i in self.deleted_rows:
+                continue
+            for j in range(self.supply_column):    # skip the supply column
+                if j in self.deleted_cols:
+                    continue
 
-    # If everything is masked, stop
-    if np.all(masked_costs == np.inf):
-        break
+                c = self.cost_table[i][j]
+                if c < min_cost:
+                    min_cost = c
+                    min_i, min_j = i, j
 
-    # Find minimum cost cell
-    least_cost = np.min(masked_costs)
-    row, col = np.where(masked_costs == least_cost)
-    row, col = int(row[0]), int(col[0])
+        # Safety check: should not happen if has_rows_and_columns_left() is True
+        if min_i == -1 or min_j == -1:
+            self.halt("No feasible cell found in LeastCostCellMethod.choose_cost()")
 
-    # Allocate max possible amount
-    quantity = min(Supply[row], Demand[col])
-    allocation[row, col] = quantity
-
-    # Reduce supply/demand
-    Supply[row] -= quantity
-    Demand[col] -= quantity
-
-    print(f"Allocated {quantity} units to cell ({row}, {col}) with cost {least_cost}")
-    print("Remaining Supply:", Supply)
-    print("Remaining Demand:", Demand)
-    print("---")
-
-# Compute total cost
-total_cost = np.sum(allocation * costs_matrix)
-
-print("\nFinal Allocation Matrix:")
-print(allocation)
-
-print("\nTotal Transportation Cost:", total_cost)
-
-t = timeit.timeit("sum(i*i for i in range(1000))", number=1000)
-print(round(t, 4))
+        # Assign min(demand, supply) to that cell.
+        # best_value_at(i, j) returns (best, i, j) and also updates deleted rows/cols.
+        self.assign(*self.best_value_at(min_i, min_j))
