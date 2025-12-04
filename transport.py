@@ -5,6 +5,9 @@ from method_type import MethodType
 from north_west import NorthWestMethod
 from russell import RussellMethod
 from vogel import VogelMethod
+from least_cost_cell_method import LeastCostCellMethod
+from least_cost_row_method import LeastCostRowMethod
+from least_cost_column_method import LeastCostColumnMethod
 
 # Argument handler
 parser = argparse.ArgumentParser(
@@ -52,7 +55,10 @@ def main():
     solving_methods = {
         MethodType.NORTH_WEST_METHOD: NorthWestMethod,
         MethodType.VOGEL_METHOD: VogelMethod,
-        MethodType.RUSSELL_METHOD: RussellMethod
+        MethodType.RUSSELL_METHOD: RussellMethod,
+        MethodType.LEAST_COST_CELL_METHOD: LeastCostCellMethod,
+        MethodType.LEAST_COST_ROW_METHOD: LeastCostRowMethod,
+        MethodType.LEAST_COST_COLUMN_METHOD: LeastCostColumnMethod
     }
     desired_method = MethodType(args.method)
     solver = solving_methods.get(desired_method)(file=args.file)
