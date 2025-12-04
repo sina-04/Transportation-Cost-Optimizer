@@ -65,4 +65,5 @@ The `-h` flag displays the help for the program execution. test
 ---
 ## Authors
 
-* Wilhelm Carstens **@wolam**
+- Wilhelm Carstens **@wolam**
+- Sina Rezaei **@sina-04**
