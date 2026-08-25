@@ -1,69 +1,81 @@
-# transportation-cost
-Transportation cost problem solver using Russell, Vogel and North West Corner approximation methods
+# Transportation Cost Optimizer
 
-## Installation
+A Python command-line solver for constructing initial feasible solutions to
+balanced transportation problems with:
 
-Download the GitHub repository via SSH or HTTPS
+- the North-West Corner method;
+- Vogel's Approximation Method;
+- Russell's Approximation Method.
+
+## Fork and authorship
+
+This repository is a fork of
+[`wilhelmcs/transportation-cost`](https://github.com/wilhelmcs/transportation-cost).
+The upstream project credits Wilhelm Carstens (`@wolam`); this fork also
+records Sina Rezaei (`@sina-04`) in its authorship metadata.
+
+The upstream repository does not publish a software license. Consequently,
+this fork does **not** add a new license or grant permission to copy, modify,
+or redistribute the upstream implementation. Contact the upstream author
+before reusing the code beyond what applicable law permits.
+
+## Setup
 
 ```bash
-$ git clone URL
-````
-
-Define a virtual environment
-
-```bash
-$ python3 -m venv .venv
+git clone https://github.com/sina-04/Transportation-Cost-Optimizer.git
+cd Transportation-Cost-Optimizer
+python -m venv .venv
 ```
 
-Activate the virtual environment for further dependencies.
+Activate the environment and install dependencies:
 
 ```bash
-$ source .venv/bin/activate
-```
+# Linux/macOS
+source .venv/bin/activate
 
-Make sure pip is installed on your computer, check the [pip official documentation](https://pip.pypa.io/en/stable/installation/)
-if it isn't.
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
 
-```bash
-(.venv) $ pip3 install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ## Run
 
 ```bash
-(.venv) $ ./transporte.py [-h] method file.txt
+python transport.py METHOD INPUT_FILE
 ```
 
-### Arguments
+`METHOD` is:
 
-`method` Approximation method used to solve the problem.
+| Value | Approximation method |
+| --- | --- |
+| `1` | North-West Corner |
+| `2` | Vogel |
+| `3` | Russell |
 
-    1 = NORTH WEST APPROXIMATION METHOD
-    2 = VOGEL APPROXIMATION METHOD
-    3 = RUSSELL APPROXIMATION METHOD    
+Example:
 
-`file.txt` Text file with the transportation problem in the correct format.
- The file has the following structure, separated by commas.
-Supply column, demand row, transportation costs. 
+```bash
+python transport.py 2 res/problem1.txt
+```
 
-For example if the problem comes in the following form:
-           
-            D1      D2      D3      Supply
-    S1      8       6       10      2000
-    S2      10      4       9       2500
-    Demand 1500     2000    1000
-        
-The file must come as shown below:
+An input file contains a supply row, a demand row, and the transportation-cost
+matrix as comma-separated values:
 
-    2000,2500
-    1500,2000,1000
-    8,6,10
-    10,4,9
+```text
+2000,2500
+1500,2000,1000
+8,6,10
+10,4,9
+```
 
-The `-h` flag displays the help for the program execution. test
+## Limitations
 
----
-## Authors
+The methods construct initial transportation solutions; they do not by
+themselves prove global optimality. Validate dimensions, balance, and results
+before using an output in operational decisions.
 
-- Wilhelm Carstens **@wolam**
-- Sina Rezaei **@sina-04**
+## License
+
+No license has been supplied by the upstream project, so none is asserted
+here. The absence of a license means normal copyright restrictions apply.
